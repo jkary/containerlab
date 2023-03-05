@@ -5,6 +5,7 @@
 package clab
 
 import (
+	vr_cat9kv "github.com/srl-labs/containerlab/nodes/vr_cat9kv"
 	bridge "github.com/srl-labs/containerlab/nodes/bridge"
 	c8000 "github.com/srl-labs/containerlab/nodes/c8000"
 	ceos "github.com/srl-labs/containerlab/nodes/ceos"
@@ -52,6 +53,7 @@ func (c *CLab) RegisterNodes() {
 	sonic.Register(c.Reg)
 	srl.Register(c.Reg)
 	vr_csr.Register(c.Reg)
+	vr_cat9kv.Register(c.Reg)
 	vr_ftosv.Register(c.Reg)
 	vr_n9kv.Register(c.Reg)
 	vr_nxos.Register(c.Reg)

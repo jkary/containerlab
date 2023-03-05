@@ -53,6 +53,8 @@
                         "vr-juniper_vmx",
                         "vr-vqfx",
                         "vr-juniper_vqfx",
+                        "vr-cat9kv",
+                        "vr-cisco_cat9kv",
                         "vr-xrv",
                         "vr-cisco_xrv",
                         "vr-xrv9k",
