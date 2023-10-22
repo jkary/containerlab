@@ -25,6 +25,8 @@ type ContainerRuntime interface {
 	WithMgmtNet(*types.MgmtNet)
 	// Instructs the runtime not to delete the mgmt network on destroy
 	WithKeepMgmtNet()
+	// Lab name from the topology file
+	WithLabName(string)
 	// Create container (bridge) network
 	CreateNet(context.Context) error
 	// Delete container (bridge) network
@@ -78,12 +80,19 @@ type RuntimeConfig struct {
 	GracefulShutdown bool
 	Debug            bool
 	KeepMgmtNet      bool
+	LabName          string
 }
 
 var ContainerRuntimes = map[string]Initializer{}
 
 func Register(name string, initFn Initializer) {
 	ContainerRuntimes[name] = initFn
+}
+
+func WithLabName(name string) RuntimeOption {
+	return func(r ContainerRuntime) {
+		r.WithLabName(name)
+	}
 }
 
 func WithConfig(cfg *RuntimeConfig) RuntimeOption {

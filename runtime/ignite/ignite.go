@@ -65,7 +65,7 @@ func (c *IgniteRuntime) Init(opts ...runtime.RuntimeOption) error {
 		return fmt.Errorf("cannot find %q: %s", kvmPath, err)
 	}
 
-	// ensure firecracker directroy
+	// ensure firecracker directory
 	for _, path := range runtimePaths {
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			if err := os.MkdirAll(path, os.ModeDir); err != nil {
@@ -130,6 +130,7 @@ func (c *IgniteRuntime) WithMgmtNet(n *types.MgmtNet) {
 	c.mgmt = n
 }
 
+func (c *IgniteRuntime) WithLabName(name string) {}
 func (c *IgniteRuntime) CreateNet(ctx context.Context) error {
 	return c.ctrRuntime.CreateNet(ctx)
 }
@@ -393,6 +394,7 @@ func (ir *IgniteRuntime) produceGenericContainerList(input []*api.VM) ([]runtime
 	return result, nil
 }
 
+func (c *IgniteRuntime) GetNS(ctrId string) int { return -1 }
 func (c *IgniteRuntime) GetNSPath(ctx context.Context, ctrId string) (string, error) {
 	result, err := c.ctrRuntime.GetNSPath(ctx, ctrId)
 	if err != nil {

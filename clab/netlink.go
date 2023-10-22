@@ -5,6 +5,7 @@
 package clab
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"strings"
@@ -15,6 +16,7 @@ import (
 	"github.com/srl-labs/containerlab/types"
 	"github.com/srl-labs/containerlab/utils"
 	"github.com/vishvananda/netlink"
+	"github.com/vishvananda/netns"
 )
 
 type vEthEndpoint struct {
@@ -27,7 +29,7 @@ type vEthEndpoint struct {
 }
 
 // CreateVirtualWiring creates the virtual topology between the containers.
-func (c *CLab) CreateVirtualWiring(l *types.Link) (err error) {
+func (c *CLab) CreateVirtualWiring(ctx context.Context, l *types.Link) (err error) {
 	log.Infof("Creating virtual wire: %s:%s <--> %s:%s", l.A.Node.ShortName, l.A.EndpointName, l.B.Node.ShortName, l.B.EndpointName)
 
 	// connect containers (or container and a bridge) using veth pair
@@ -36,15 +38,16 @@ func (c *CLab) CreateVirtualWiring(l *types.Link) (err error) {
 	vA := vEthEndpoint{
 		LinkName: l.A.EndpointName,
 		NSName:   l.A.Node.LongName,
-		NSPath:   l.A.Node.NSPath,
+		NSPath:   fmt.Sprintf("/run/netns/%s", c.Config.Name),
 	}
 	// veth side B
 	vB := vEthEndpoint{
 		LinkName: l.B.EndpointName,
 		NSName:   l.B.Node.LongName,
-		NSPath:   l.B.Node.NSPath,
+		NSPath:   fmt.Sprintf("/run/netns/%s", c.Config.Name),
 	}
 
+	log.Infof("Namespace for LinkA is %s and LinkB is %s", vA.NSPath, vB.NSPath)
 	// get random names for veth sides as they will be created in root netns first
 	ARndmName := fmt.Sprintf("clab-%s", genIfName())
 	BRndmName := fmt.Sprintf("clab-%s", genIfName())
@@ -93,8 +96,8 @@ func (c *CLab) CreateVirtualWiring(l *types.Link) (err error) {
 		return err
 	}
 
-	// create veth pair in the root netns
-	vA.Link, vB.Link, err = createVethIface(ARndmName, BRndmName, l.MTU, aMAC, bMAC)
+	// Obtain the netns from A side
+	vA.Link, vB.Link, err = createVethIface(ARndmName, BRndmName, l.MTU, vA.NSPath, aMAC, bMAC)
 	if err != nil {
 		return err
 	}
@@ -103,17 +106,21 @@ func (c *CLab) CreateVirtualWiring(l *types.Link) (err error) {
 	if err := utils.EthtoolTXOff(ARndmName); err != nil {
 		return err
 	}
+	log.Debug("After EthtoolTXOff on A")
 	if err := utils.EthtoolTXOff(BRndmName); err != nil {
 		return err
 	}
+	log.Debug("After EthtoolTXOff on B")
 
 	if err = vA.setVethLink(); err != nil {
 		_ = netlink.LinkDel(vA.Link)
 		return err
 	}
+	log.Debug("After setVethLink on A")
 	if err = vB.setVethLink(); err != nil {
 		_ = netlink.LinkDel(vB.Link)
 	}
+	log.Debug("After setVethLink on B")
 	return err
 }
 
@@ -155,16 +162,25 @@ func (c *CLab) RemoveHostOrBridgeVeth(l *types.Link) (err error) {
 
 // createVethIface takes two veth endpoint structs and create a veth pair and return
 // veth interface links.
-func createVethIface(ifName, peerName string, mtu int, aMAC, bMAC net.HardwareAddr) (linkA, linkB netlink.Link, err error) {
+func createVethIface(ifName, peerName string, mtu int, nspath string, aMAC, bMAC net.HardwareAddr) (linkA, linkB netlink.Link, err error) {
+	log.Info("Inside 'createVethIface")
+	log.Debugf("nspath = %s", nspath)
+
+	namespace, err := netns.GetFromPath(nspath)
+	if err != nil {
+		return nil, nil, err
+	}
 	linkA = &netlink.Veth{
 		LinkAttrs: netlink.LinkAttrs{
 			Name:         ifName,
 			HardwareAddr: aMAC,
 			Flags:        net.FlagUp,
 			MTU:          mtu,
+			Namespace:    namespace,
 		},
 		PeerName:         peerName,
 		PeerHardwareAddr: bMAC,
+		PeerNamespace:    namespace,
 	}
 
 	if err := netlink.LinkAdd(linkA); err != nil {
@@ -175,6 +191,9 @@ func createVethIface(ifName, peerName string, mtu int, aMAC, bMAC net.HardwareAd
 		err = fmt.Errorf("failed to lookup %q: %v", peerName, err)
 	}
 
+	// Move them to the lab namespace
+
+	log.Infof("End of createVethIface")
 	return
 }
 

@@ -79,6 +79,7 @@ func WithRuntime(name string, rtconfig *runtime.RuntimeConfig) ClabOption {
 			log.Debugf("Running runtime.Init with params %+v and %+v", rtconfig, c.Config.Mgmt)
 			err := r.Init(
 				runtime.WithConfig(rtconfig),
+				runtime.WithLabName(c.Config.Name),
 				runtime.WithMgmtNet(c.Config.Mgmt),
 			)
 			if err != nil {
@@ -341,12 +342,14 @@ func (c *CLab) scheduleNodes(ctx context.Context, maxWorkers int,
 				}
 
 				// PreDeploy
+				log.Debugf("Initiate pre-deploy")
 				err = node.PreDeploy(ctx, nodecert)
 				if err != nil {
 					log.Errorf("failed pre-deploy phase for node %q: %v", node.Config().ShortName, err)
 					continue
 				}
 				// Deploy
+				log.Debugf("Initiate deploy")
 				err = node.Deploy(ctx)
 				if err != nil {
 					log.Errorf("failed deploy phase for node %q: %v", node.Config().ShortName, err)
@@ -457,7 +460,7 @@ func (c *CLab) CreateLinks(ctx context.Context, workers uint) {
 						return
 					}
 					log.Debugf("Link worker %d received link: %+v", i, link)
-					if err := c.CreateVirtualWiring(link); err != nil {
+					if err := c.CreateVirtualWiring(ctx, link); err != nil {
 						log.Error(err)
 					}
 				case <-ctx.Done():

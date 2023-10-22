@@ -5,7 +5,6 @@
 package clab
 
 import (
-	vr_cat9kv "github.com/srl-labs/containerlab/nodes/vr_cat9kv"
 	bridge "github.com/srl-labs/containerlab/nodes/bridge"
 	c8000 "github.com/srl-labs/containerlab/nodes/c8000"
 	ceos "github.com/srl-labs/containerlab/nodes/ceos"
@@ -21,6 +20,7 @@ import (
 	ovs "github.com/srl-labs/containerlab/nodes/ovs"
 	sonic "github.com/srl-labs/containerlab/nodes/sonic"
 	srl "github.com/srl-labs/containerlab/nodes/srl"
+	vr_cat9kv "github.com/srl-labs/containerlab/nodes/vr_cat9kv"
 	vr_csr "github.com/srl-labs/containerlab/nodes/vr_csr"
 	vr_ftosv "github.com/srl-labs/containerlab/nodes/vr_ftosv"
 	vr_n9kv "github.com/srl-labs/containerlab/nodes/vr_n9kv"

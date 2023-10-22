@@ -117,7 +117,7 @@ var vethCreateCmd = &cobra.Command{
 			MTU: MTU,
 		}
 
-		if err := c.CreateVirtualWiring(link); err != nil {
+		if err := c.CreateVirtualWiring(ctx, link); err != nil {
 			return err
 		}
 		log.Info("veth interface successfully created!")

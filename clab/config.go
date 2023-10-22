@@ -258,6 +258,12 @@ func (c *CLab) createNodeCfg(nodeName string, nodeDef *types.NodeDefinition, idx
 
 	nodeCfg.Config = c.Config.Topology.GetNodeConfigDispatcher(nodeCfg.ShortName)
 
+	// Set node namespace
+	if nodeCfg.NSPath == "" {
+		log.Debugf("NodeCfg.run = %s", nodeCfg.Runtime)
+		nodeCfg.NSPath, _ = c.GlobalRuntime().GetNSPath(nil, nodeCfg.LongName)
+	}
+
 	return nodeCfg, nil
 }
 
@@ -274,6 +280,7 @@ func (c *CLab) NewLink(l *types.LinkConfig) *types.Link {
 		Labels: l.Labels,
 		Vars:   l.Vars,
 	}
+
 }
 
 // NewEndpoint initializes a new endpoint object.

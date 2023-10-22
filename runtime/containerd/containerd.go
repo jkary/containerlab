@@ -103,6 +103,7 @@ func (c *ContainerdRuntime) WithMgmtNet(n *types.MgmtNet) {
 func (c *ContainerdRuntime) WithKeepMgmtNet() {
 	c.config.KeepMgmtNet = true
 }
+func (c *ContainerdRuntime) WithLabName(name string)       {}
 func (*ContainerdRuntime) GetName() string                 { return runtimeName }
 func (c *ContainerdRuntime) Config() runtime.RuntimeConfig { return c.config }
 
@@ -124,7 +125,7 @@ func (c *ContainerdRuntime) DeleteNet(context.Context) error {
 		if !brInUse {
 			// Stop early if bridge no longer in use
 			// Need to wait some time, since the earlier veth deletion
-			// triggert from the cotnainer deletion is async and needs
+			// triggert from the container deletion is async and needs
 			// to finish. W'll have a race condition otherwise.
 			break
 		}
@@ -713,6 +714,7 @@ func timeSinceInHuman(since time.Time) string {
 	return units.HumanDuration(time.Since(since)) + " ago"
 }
 
+func (c *ContainerdRuntime) GetNS(containername string) int { return -1 }
 func (c *ContainerdRuntime) GetNSPath(ctx context.Context, containername string) (string, error) {
 	ctx = namespaces.WithNamespace(ctx, containerdNamespace)
 	task, err := c.getContainerTask(ctx, containername)

@@ -113,7 +113,7 @@ func (d *DockerRuntime) WithMgmtNet(n *types.MgmtNet) {
 	if d.mgmt.Bridge == "" && d.mgmt.Network != "" {
 		// fetch the network by the name set in the topo and populate the bridge name used by this network
 		netRes, err := d.Client.NetworkInspect(context.TODO(), d.mgmt.Network, dockerTypes.NetworkInspectOptions{})
-		// if the network is succesfully found, set the bridge used by it
+		// if the network is successfully found, set the bridge used by it
 		if err == nil {
 			d.mgmt.Bridge = "br-" + netRes.ID[:12]
 			log.Debugf("detected network name in use: %s, backed by a bridge %s", d.mgmt.Network, d.mgmt.Bridge)
@@ -121,6 +121,8 @@ func (d *DockerRuntime) WithMgmtNet(n *types.MgmtNet) {
 
 	}
 }
+
+func (d *DockerRuntime) WithLabName(name string) {}
 
 // CreateNet creates a docker network or reusing if it exists.
 func (d *DockerRuntime) CreateNet(ctx context.Context) (err error) {
@@ -442,6 +444,7 @@ func (d *DockerRuntime) CreateContainer(ctx context.Context, node *types.NodeCon
 	}
 	return cont.ID, nil
 }
+func (d *DockerRuntime) GetNS(cID string) int { return -1 }
 
 // GetNSPath inspects a container by its name/id and returns a netns path using the pid of a container.
 func (d *DockerRuntime) GetNSPath(ctx context.Context, cID string) (string, error) {
