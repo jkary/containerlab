@@ -2,7 +2,7 @@
 hide:
   - navigation
 ---
-<p align=center><object type="image/svg+xml" data=https://cdn.jsdelivr.net/gh/srl-labs/containerlab@main/docs/images/containerlab_export_white_ink_js.svg ></object></p>
+<p align=center><a href="https://containerlab.dev"><img src=images/containerlab_export_white_ink.svg?sanitize=true/></a></p>
 
 [![github release](https://img.shields.io/github/release/srl-labs/containerlab.svg?style=flat-square&color=00c9ff&labelColor=bec8d2)](https://github.com/srl-labs/containerlab/releases/)
 [![Github all releases](https://img.shields.io/github/downloads/srl-labs/containerlab/total.svg?style=flat-square&color=00c9ff&labelColor=bec8d2)](https://github.com/srl-labs/containerlab/releases/)
@@ -73,7 +73,7 @@ This short clip briefly demonstrates containerlab features and explains its purp
 
 ## Features
 
-* **IaaC approach**  
+* **Lab as Code (IaC) approach**  
     Declarative way of defining the labs by means of the topology definition [`clab` files](manual/topo-def-file.md).
 * **Network Operating Systems centric**  
     Focus on containerized Network Operating Systems. The sophisticated startup requirements of various NOS containers are abstracted with [kinds](manual/kinds/index.md) which allows the user to focus on the use cases, rather than infrastructure hurdles.

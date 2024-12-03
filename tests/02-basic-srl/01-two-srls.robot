@@ -145,8 +145,17 @@ Verify TLS works with JSON-RPC, certificate check and IP address as SAN
     Should Be Equal As Integers    ${rc}    0
     Should Not Contain    ${output}    error
 
+Verify NETCONF works
+    Skip If    '${runtime}' != 'docker'
+    ${rc}    ${output} =    Run And Return Rc And Output
+    ...    sudo docker run --name net-cons2-clab --rm --network clab ghcr.io/hellt/netconf-console2:3.0.1 --host clab-${lab-name}-srl1 --port 830 -u admin -p 'NokiaSrl1!' --hello
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    base:1.1
+
 
 *** Keywords ***
 Cleanup
     Run    sudo -E ${CLAB_BIN} --runtime ${runtime} destroy -t ${CURDIR}/${lab-file-name} --cleanup
+    Run    sudo docker rm -f net-cons2-clab
     Run    rm -f ${key-path}*

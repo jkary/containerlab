@@ -61,7 +61,7 @@ nav:
           - External container: manual/kinds/ext-container.md
           - Host: manual/kinds/host.md
       - Configuration artifacts: manual/conf-artifacts.md
-      - Network wiring concepts: manual/network.md
+      - Network: manual/network.md
       - Packet capture & Wireshark: manual/wireshark.md
       - VM based routers integration: manual/vrnetlab.md
       - Clabernetes:
@@ -252,10 +252,10 @@ theme:
     text: Google Sans
     code: Fira Mono
   icon:
-    logo: fontawesome/solid/flask
+    logo: clab/icon
     repo: fontawesome/brands/github
     edit: material/file-edit-outline
-  favicon: images/flask.svg
+  favicon: images/favicon.svg
 
 # Plugins
 plugins:
@@ -270,10 +270,14 @@ plugins:
   #- typeset
   - glightbox
   - macros:
-      j2_block_start_string: "[[[%"
-      j2_block_end_string: "%]]]"
-      j2_variable_start_string: "[[["
-      j2_variable_end_string: "]]]"
+      j2_block_start_string: "-{{%"
+      j2_block_end_string: "%}}-"
+      j2_variable_start_string: "-{{"
+      j2_variable_end_string: "}}-"
+      # include_yaml:
+      #   - macros/vars.yml
+      include_dir: macros
+      module_name: macros/main
 
 # Customization
 extra:
